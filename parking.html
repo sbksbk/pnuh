@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>주차요금 정산</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: #222;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .column {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 300px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    h1, h3 {
+      text-align: center;
+      color: #1a1a1a;
+    }
+
+    .display {
+      font-size: 28px;
+      background: #ffffff;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: center;
+      border: 2px solid #4a90e2;
+      border-radius: 10px;
+      min-height: 50px;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .keypad button, .action, .payment-methods button {
+      font-size: 22px;
+      padding: 20px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .keypad button:hover, .action:hover, .payment-methods button:hover {
+      background: #3566a8;
+    }
+
+    .action {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .result, #timeSection, #payment {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .visible {
+      opacity: 1 !important;
+    }
+
+    .result {
+      font-size: 20px;
+      text-align: center;
+      margin-top: 20px;
+      background: #f2f6fb;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #aac8e2;
+    }
+
+    .payment-methods button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="column">
+      <h1>주차요금 정산</h1>
+      <div class="display" id="plateDisplay">차량번호 입력</div>
+      <div class="keypad">
+        <button onclick="appendChar('1')">1</button>
+        <button onclick="appendChar('2')">2</button>
+        <button onclick="appendChar('3')">3</button>
+        <button onclick="appendChar('4')">4</button>
+        <button onclick="appendChar('5')">5</button>
+        <button onclick="appendChar('6')">6</button>
+        <button onclick="appendChar('7')">7</button>
+        <button onclick="appendChar('8')">8</button>
+        <button onclick="appendChar('9')">9</button>
+        <button onclick="appendChar('0')">0</button>
+        <button onclick="backspace()">←</button>
+        <button onclick="clearInput()">지우기</button>
+      </div>
+    </div>
+
+    <div class="column">
+      <div id="timeSection">
+        <h3>주차 시간</h3>
+        <div class="display" id="timeDisplay">2 시간</div>
+        <button class="action" onclick="calculate()">요금 계산</button>
+      </div>
+      <div id="result" class="result"></div>
+      <div id="payment">
+        <p style="text-align:center; margin-top:20px;">결제 방법 선택</p>
+        <div class="payment-methods">
+          <button class="action" onclick="pay('카드')">카드 결제</button>
+          <button class="action" onclick="pay('삼성페이')">삼성페이 결제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let plateNumber = '';
+    const timeInput = 2;
+
+    function appendChar(char) {
+      if (plateNumber.length < 4) {
+        plateNumber += char;
+        updateDisplay();
+      }
+    }
+
+    function backspace() {
+      plateNumber = plateNumber.slice(0, -1);
+      updateDisplay();
+    }
+
+    function clearInput() {
+      plateNumber = '';
+      updateDisplay();
+    }
+
+    function isValidPlate(num) {
+      return /^[0-9]{4}$/.test(num);
+    }
+
+    function updateDisplay() {
+      document.getElementById("plateDisplay").innerText = plateNumber || '차량번호 입력';
+      const timeDiv = document.getElementById("timeSection");
+      if (isValidPlate(plateNumber)) {
+        timeDiv.classList.add("visible");
+      } else {
+        timeDiv.classList.remove("visible");
+        document.getElementById("result").classList.remove("visible");
+        document.getElementById("payment").classList.remove("visible");
+      }
+    }
+
+    function calculate() {
+      if (!isValidPlate(plateNumber)) {
+        alert("차량번호는 숫자 4자리로 입력해주세요.");
+        return;
+      }
+
+      const price = 3000 * timeInput;
+      document.getElementById("result").innerHTML = `총 주차 요금은 <strong>${price.toLocaleString()}원</strong> 입니다.`;
+      document.getElementById("result").classList.add("visible");
+      document.getElementById("payment").classList.add("visible");
+    }
+
+    function pay(method) {
+      alert(`${method}로 결제가 완료되었습니다.\n감사합니다!`);
+      location.reload();
+    }
+  </script>
+</body>
+</html>
